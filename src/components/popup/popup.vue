@@ -26,7 +26,7 @@ export default {
   },
   methods: {
     maskClick () {
-      this.$emit('hide-popup')
+      this.$emit('hide')
     }
   }
 }

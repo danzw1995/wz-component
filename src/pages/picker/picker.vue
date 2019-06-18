@@ -1,24 +1,28 @@
 <template>
   <view>
-    <h2>datePicker</h2>
+    <h2>picker</h2>
     <button @click="show">确定</button>
     <button @click="hide">隐藏</button>
-    <wz-date-picker
+    <wz-picker
       :visible="visible"
       @hide="hide"
       @confirm="confirm"
-      @cancel="cancel">
+      @cancel="cancel"
+      :range="range"
+      :default-value="defaultValue">
       <view>确定</view>
-    </wz-date-picker>
+    </wz-picker>
   </view>
 </template>
 
 <script>
-import WzDatePicker from 'components/datePicker/datePicker'
+import WzPicker from 'components/picker/picker'
 export default {
   data () {
     return {
-      visible: false
+      visible: false,
+      range: [1, 2, 3, 4, 5],
+      defaultValue: 2
     }
   },
   methods: {
@@ -32,13 +36,13 @@ export default {
       this.hide()
       console.log('confirm', value)
     },
-    cancel (value) {
-      this.hide()
+    cancel () {
+      this.hide(value)
       console.log('cancel', value)
     }
   },
   components: {
-    WzDatePicker
+    WzPicker
   }
 }
 </script>

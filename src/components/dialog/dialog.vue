@@ -1,5 +1,5 @@
 <template>
-  <wz-popup :visible="visible" @hide-popup="hidePopup">
+  <wz-popup :visible="visible" @hide="hide">
     <view class="wz-dialog">
       <view class="wz-dialog__container">
         <view class="wz-dialog__header"></view>
@@ -25,8 +25,8 @@ export default {
     WzPopup
   },
   methods: {
-    hidePopup () {
-      this.$emit('hide-popup')
+    hide () {
+      this.$emit('hide')
     }
   }
 }

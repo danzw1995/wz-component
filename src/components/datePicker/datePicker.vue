@@ -1,34 +1,32 @@
 <template>
-  <wz-popup :visible="visible" @hide-popup="hide" :bottom="true">
-    <view class="wz-picker">
-      <view class="wz-picker__btns">
-        <view class="wz-picker__btns--cancel" @click="cancel">{{ cancelText }}</view>
-        <view class="wz-picker__btns--confirm" @click="confirm">{{ confirmText }}</view>
-      </view>
-      <view class="wz-picker__view">
-        <picker-view :value="value" @change="bindChange">
-          <picker-view-column>
-            <view v-for="(item, index) in pickerData.years" :key="index">{{ item }}年</view>
-          </picker-view-column>
-          <picker-view-column>
-            <view v-for="(item, index) in pickerData.months" :key="index">{{ item }}月</view>
-          </picker-view-column>
-          <picker-view-column>
-            <view v-for="(item, index) in pickerData.days" :key="index">{{ item }}日</view>
-          </picker-view-column>
-          <picker-view-column>
-            <view v-for="(item, index) in pickerData.times" :key="index">{{ item }}</view>
-          </picker-view-column>
-        </picker-view>
-      </view>
-    </view>
-  </wz-popup>
+  <wz-base-picker
+    :visible="visible"
+    @hide="hide"
+    @cancel="cancel"
+    @confirm="confirm"
+    :bottom="true"
+    :cancel-text="cancelText"
+    :confirm-text="confirmText">
+    <picker-view :value="value" @change="bindChange">
+      <picker-view-column>
+        <view v-for="(item, index) in pickerData.years" :key="index">{{ item }}年</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view v-for="(item, index) in pickerData.months" :key="index">{{ item }}月</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view v-for="(item, index) in pickerData.days" :key="index">{{ item }}日</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view v-for="(item, index) in pickerData.times" :key="index">{{ item }}</view>
+      </picker-view-column>
+    </picker-view>
+  </wz-base-picker>
 </template>
 
 <script>
-import WzPopup from 'components/popup/popup'
+import WzBasePicker from 'components/basePicker/basePicker'
 
-const NOW_DATE = new Date()
 export default {
   props: {
     visible: {
@@ -43,10 +41,6 @@ export default {
       type: String,
       default: '确定'
     },
-    mode: {
-      type: String,
-      default: 'dat'
-    },
     startTime: {
       type: String,
       default: '2018-06-10'
@@ -54,31 +48,26 @@ export default {
     endTime: {
       type: String,
       default: '2022-09-24'
+    },
+    defaultTime: {
+      type: [Date, String],
+      default: null
     }
   },
   computed: {
     start () {
-      let [year, month, day] = this.startTime.split('-')
-      return {
-        year,
-        month,
-        day
-      }
+      return this.formatDate(this.startTime)
     },
     end () {
-      let [year, month, day] = this.endTime.split('-')
-      return {
-        year,
-        month,
-        day
-      }
+      return this.formatDate(this.endTime)
     }
   },
   data () {
     return {
       pickerData: {},
       current: {},
-      value: [0, 0, 0, 0]
+      value: [0, 0, 0, 0],
+      now: new Date()
     }
   },
   methods: {
@@ -86,12 +75,23 @@ export default {
       let value = e.detail.value
       let current = this.format(value)
 
+      // 更新月份
       this.pickerData.months = this.initMonth(current, true)
+
+      // 更新天
       this.pickerData.days = this.initDay(current, true)
       this.$nextTick(() => {
         this.value = value
         this.current = current
       })
+    },
+    formatDate (timeStr) {
+      let [year, month, day] = timeStr.split('-')
+      return {
+        year,
+        month,
+        day
+      }
     },
     format (value) {
       let [yearIndex, monthIndex, dayIndex, timeIndex] = value
@@ -108,7 +108,7 @@ export default {
       }
     },
     hide () {
-      this.$emit('hide-popup')
+      this.$emit('hide')
     },
     cancel () {
       this.$emit('cancel', this.current)
@@ -118,9 +118,12 @@ export default {
     },
     initPicker () {
      
+      // 处理当前时间
+      let defTime = this.dealNowTime()
+
       let years = this.initYear(this.start.year, this.end.year)
-      let months = this.initMonth(this.start)
-      let days = this.initDay(this.start)
+      let months = this.initMonth(defTime)
+      let days = this.initDay(defTime)
       let times = this.initTime()
 
       
@@ -131,14 +134,11 @@ export default {
         times
       }
 
-      // 默认值设置，目前有问题
-      // let defTime = this.dealNowTime()
-      // console.log(defTime)
-      // let value = this.find(defTime)
-      // this.$nextTick(() => {
-      //   this.value = value
-      //   this.current = defTime
-      // })
+      let value = this.find(defTime)
+      // 一定要延时
+      setTimeout(() => {
+        this.value = value
+      })
     },
     initYear (startYear, endYear) {
       let years = []
@@ -147,21 +147,15 @@ export default {
       }
       return years
     },
-    initMonth (current, flag) {
+    initMonth (current) {
       let months = []
       let startMonth
       let endMonth
-      if (flag) {
-        // picker改变时的渲染 
-        // 1.当前所选时间的年份等于开始时间的年份 则取开始时间的月份
-        // 2.当前所选时间的年份等于结束时间的年份 则却结束时间的月份
-        startMonth = current.year === this.start.year ? Number(this.start.month) : 1
-        endMonth = current.year === this.end.year ? Number(this.end.month) : 12
-      } else {
-        // 初始渲染
-        startMonth = Number(current.month)
-        endMonth = 12
-      }
+      // picker改变时的渲染 
+      // 1.当前所选时间的年份等于开始时间的年份 则取开始时间的月份
+      // 2.当前所选时间的年份等于结束时间的年份 则却结束时间的月份
+      startMonth = current.year === this.start.year ? Number(this.start.month) : 1
+      endMonth = current.year === this.end.year ? Number(this.end.month) : 12
       for (let month = startMonth; month <= endMonth; month ++) {
         months.push(this.padZero(month))
       }
@@ -171,21 +165,16 @@ export default {
       let days = []
       let startDay
       let endDay
-      if (flag) {
-        // 1. 当前所选时间的年份、月份与开始时间一致时 取开始时间的天
-        // 2. 当前所选时间的年份、月份与结束时间一致时 取结束时间的天
-        startDay = current.year === this.start.year 
-          && current.month === this.start.month 
-          ? Number(this.start.day)
-          : 1
-        endDay = current.year === this.end.year
-          && current.month === this.end.month
-          ? Number(this.end.day)
-          : new Date(current.year, current.month, 0).getDate()
-      } else {
-        startDay = current.day
-        endDay = new Date(current.year, current.month, 0).getDate()
-      }
+      // 1. 当前所选时间的年份、月份与开始时间一致时 取开始时间的天
+      // 2. 当前所选时间的年份、月份与结束时间一致时 取结束时间的天
+      startDay = current.year === this.start.year 
+        && current.month === this.start.month 
+        ? Number(this.start.day)
+        : 1
+      endDay = current.year === this.end.year
+        && current.month === this.end.month
+        ? Number(this.end.day)
+        : new Date(current.year, current.month, 0).getDate()
       
       for (let day = startDay; day <= endDay; day ++) {
         days.push(this.padZero(day))
@@ -196,22 +185,24 @@ export default {
       return ['上午', '下午']
     },
     dealNowTime () {
-      let year = `${NOW_DATE.getFullYear()}`
-      let month = `${this.padZero(NOW_DATE.getMonth() + 1)}`
-      let day = `${NOW_DATE.getDate()}`
+      let defaultTime = this.defaultTime ? new Date(this.defaultTime) : this.now
+      let year = `${defaultTime.getFullYear()}`
+      let month = `${this.padZero(defaultTime.getMonth() + 1)}`
+      let day = `${defaultTime.getDate()}`
+      let time = defaultTime.getHours() >= 12 ? '下午' : '上午'
       return {
         year,
         month,
         day,
-        time: '上午',
-        date: `${year}-${month}-${day}:上午`
+        time,
+        date: `${year}-${month}-${day}:${time}`
       }
     },
     find (defTime) {
-      let yearIndex = this.pickerData.years.findIndex((year => year === defTime.year))
-      let monthIndex = this.pickerData.months.findIndex((month => month === defTime.month))
-      let dayIndex = this.pickerData.days.findIndex((day => day === defTime.day))
-      let timeIndex = 0
+      let yearIndex = this.pickerData.years.findIndex(year => year === defTime.year)
+      let monthIndex = this.pickerData.months.findIndex(month => month === defTime.month)
+      let dayIndex = this.pickerData.days.findIndex(day => day === defTime.day)
+      let timeIndex = this.pickerData.times.findIndex(time => time === defTime.time)
       return [yearIndex, monthIndex, dayIndex, timeIndex]
     },
     padZero (n) {
@@ -222,43 +213,10 @@ export default {
     this.initPicker()
   },
   components: {
-    WzPopup
+    WzBasePicker
   }
 }
 </script>
 
 <style lang="scss">
-  @import 'common/styles/mixin.scss';
-  @import 'common/styles/variable.scss';
-  .wz-picker {
-
-  }
-  .wz-picker__btns {
-    @include flex($justifyContent: space-between);
-    padding: 0 20upx;
-    font-size: 34upx;
-    height: 70upx;
-  }
-  .wz-picker__btns--cancel {
-    color: #ccc;
-  }
-  .wz-picker__btns--confirm {
-    color: $themeColor;
-  }
-  .wz-picker__view {
-			height: 320upx;
-			padding-bottom: 80upx;
-			color: #000;
-			picker-view {
-				height: 100%;
-				font-size: 36upx;
-			}
-			picker-view-column {
-				text-align: center;
-				view {
-					height: 68upx;
-					line-height: 68upx;
-				}
-			}
-		}
 </style>

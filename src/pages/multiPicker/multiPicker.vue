@@ -3,22 +3,24 @@
     <h2>datePicker</h2>
     <button @click="show">确定</button>
     <button @click="hide">隐藏</button>
-    <wz-date-picker
+    <wz-multi-picker
       :visible="visible"
+      :default-value="defaultValue"
       @hide="hide"
       @confirm="confirm"
       @cancel="cancel">
       <view>确定</view>
-    </wz-date-picker>
+    </wz-multi-picker>
   </view>
 </template>
 
 <script>
-import WzDatePicker from 'components/datePicker/datePicker'
+import WzMultiPicker from 'components/multiPicker/multiPicker'
 export default {
   data () {
     return {
-      visible: false
+      visible: false,
+      defaultValue: ['广东省', '广州市', '天河区']
     }
   },
   methods: {
@@ -38,7 +40,7 @@ export default {
     }
   },
   components: {
-    WzDatePicker
+    WzMultiPicker
   }
 }
 </script>
