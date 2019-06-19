@@ -10,7 +10,7 @@
         <view class="wz-picker__btns--confirm" @click="confirm">{{ confirmText }}</view>
       </view>
       <view class="wz-picker__view">
-        <slot></slot>
+        <slot />
       </view>
     </view>
   </wz-popup>
@@ -66,6 +66,15 @@ export default {
   @import 'common/styles/variable.scss';
   .wz-picker {
     background: #fff;
+    animation: popup 0.4s;
+  }
+  @keyframes popup {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
+    }
   }
   .wz-picker__btns {
     @include flex($justifyContent: space-between);

@@ -48,6 +48,15 @@ export default {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.4);
+    animation: show 0.4s;
+  }
+  @keyframes show {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
   }
   .wz-popup__container {
     position: absolute;

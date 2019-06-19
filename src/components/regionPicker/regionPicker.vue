@@ -136,6 +136,7 @@ export default {
       return [provinceIndex, cityIndex, areaIndex]
     },
     findIndex (list, value) {
+      // 找到则返回所在的索引，否则返回0
       return Math.max(list.findIndex(item => item[this.prop] === value), 0)
     }
   },
