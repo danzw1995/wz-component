@@ -1,5 +1,9 @@
 <template>
-  <wz-popup :visible="visible" @hide="hide" :bottom="true">
+  <wz-popup
+    :visible="visible"
+    @hide="hide"
+    :bottom="true"
+    :mask-closable="true">
     <view class="wz-picker">
       <view class="wz-picker__btns">
         <view class="wz-picker__btns--cancel" @click="cancel">{{ cancelText }}</view>
@@ -61,7 +65,7 @@ export default {
   @import 'common/styles/mixin.scss';
   @import 'common/styles/variable.scss';
   .wz-picker {
-
+    background: #fff;
   }
   .wz-picker__btns {
     @include flex($justifyContent: space-between);

@@ -36,7 +36,7 @@ export default {
       this.hide()
       console.log('confirm', value)
     },
-    cancel () {
+    cancel (value) {
       this.hide(value)
       console.log('cancel', value)
     }

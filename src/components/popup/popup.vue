@@ -14,6 +14,10 @@ export default {
       type: Boolean,
       default: false
     },
+    maskClosable: {
+      type: Boolean,
+      default: false
+    },
     bottom: {
       type: Boolean,
       default: false
@@ -26,7 +30,7 @@ export default {
   },
   methods: {
     maskClick () {
-      this.$emit('hide')
+      this.maskClosable && this.$emit('hide')
     }
   }
 }
@@ -47,14 +51,12 @@ export default {
   }
   .wz-popup__container {
     position: absolute;
-    background: #fff;
+    // background: #fff;
   }
   .wz-popup__container--default {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    // margin: auto;
-    padding: 20upx;
   }
   .wz-popup__container--bottom {
     left: 0;

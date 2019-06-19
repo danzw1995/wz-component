@@ -13,7 +13,7 @@
 			}
 		},
 		{
-			"path": "pages/multiPicker/multiPicker",
+			"path": "pages/regionPicker/regionPicker",
 			"style": {
 				"navigationBarTitleText": "uni-app"
 			}

@@ -1,21 +1,21 @@
 <template>
   <view>
-    <h2>datePicker</h2>
+    <h2>regionPicker</h2>
     <button @click="show">确定</button>
     <button @click="hide">隐藏</button>
-    <wz-multi-picker
+    <wz-region-picker
       :visible="visible"
       :default-value="defaultValue"
       @hide="hide"
       @confirm="confirm"
       @cancel="cancel">
       <view>确定</view>
-    </wz-multi-picker>
+    </wz-region-picker>
   </view>
 </template>
 
 <script>
-import WzMultiPicker from 'components/multiPicker/multiPicker'
+import WzRegionPicker from 'components/regionPicker/regionPicker'
 export default {
   data () {
     return {
@@ -40,7 +40,7 @@ export default {
     }
   },
   components: {
-    WzMultiPicker
+    WzRegionPicker
   }
 }
 </script>
