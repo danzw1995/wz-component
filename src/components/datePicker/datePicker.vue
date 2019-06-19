@@ -72,18 +72,17 @@ export default {
   },
   methods: {
     bindChange (e) {
-      let value = e.detail.value
-      let current = this.format(value)
+      this.value = e.detail.value
+      this.current = this.format(this.value)
 
       // 更新月份
-      this.pickerData.months = this.initMonth(current, true)
+      this.pickerData.months = this.initMonth(this.current)
 
       // 更新天
-      this.pickerData.days = this.initDay(current, true)
-      this.$nextTick(() => {
-        this.value = value
-        this.current = current
-      })
+      this.pickerData.days = this.initDay(this.current)
+
+      // this.value = value
+      // this.current = current
     },
     formatDate (timeStr) {
       let [year, month, day] = timeStr.split('-')
@@ -135,6 +134,7 @@ export default {
       }
 
       let value = this.find(defTime)
+      this.current = this.format(value)
       // 一定要延时
       setTimeout(() => {
         this.value = value
